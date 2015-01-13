@@ -40,6 +40,9 @@ func LoadMap(path string) TemplateMap {
 		log.Fatalf("Failed to parse file:", err.Error())
 	}
 	m := NewMap()
-	json.Unmarshal(f, &m)
+	err = json.Unmarshal(f, &m)
+	if err != nil {
+		log.Fatalf("Failed to unmarshal:", err.Error())
+	}
 	return m
 }
