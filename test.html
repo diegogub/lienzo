@@ -1,0 +1,7 @@
+{{ define "test" }}
+<p>My super template!</p>
+<p>My Data:</p>
+{{ range $key, $value := . }}
+   <li><strong>{{ $key }}</strong>: {{ $value }}</li>
+{{ end }}
+{{ end }}

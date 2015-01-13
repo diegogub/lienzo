@@ -1,0 +1,6 @@
+{
+  "/test" : {
+    "tmpl" : "test",
+    "data" : { "Test" : "my data" }
+  },
+}
