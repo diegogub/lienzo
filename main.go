@@ -24,6 +24,11 @@ var (
 )
 
 func Handler(w http.ResponseWriter, r *http.Request) {
+	defer func() {
+		if e := recover(); e != nil {
+			ErrorHTML(e, w)
+		}
+	}()
 	log.Println(r.URL.Path)
 	// parse file
 	tinfo, ok := m[r.URL.Path]
@@ -34,7 +39,8 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	// Load all templates in every request! . We don't need performace,just to load template
 	filepath.Walk(*dir, func(path string, info os.FileInfo, err error) error {
 		if strings.HasSuffix(path, *kind) {
-			tmps.ParseFiles(path)
+			log.Println("Matched files:", path)
+			tmps = template.Must(tmps.ParseFiles(path))
 		}
 		return nil
 	})
