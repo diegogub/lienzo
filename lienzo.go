@@ -15,6 +15,18 @@ func (tm TemplateMap) String() string {
 	return string(b)
 }
 
+// Sum 2 maps
+func (tm TemplateInfo) Sum(t TemplateInfo) {
+	for key, value := range t.Data {
+		if _, ok := tm.Data[key]; !ok {
+			tm.Data[key] = value
+		} else {
+			log.Println("warn: overwritting data key: "+key+":", value)
+		}
+	}
+	return
+}
+
 func (tm TemplateMap) Routes(r *mux.Router, hand func(http.ResponseWriter, *http.Request)) {
 	for route, _ := range tm {
 		r.HandleFunc(route, hand)

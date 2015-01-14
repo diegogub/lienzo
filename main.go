@@ -46,6 +46,9 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 		return nil
 	})
 
+	if _, ok := m["global"]; ok {
+		tinfo.Sum(m["global"])
+	}
 	err := tmps.ExecuteTemplate(w, tinfo.Tmpl, tinfo.Data)
 	if err != nil {
 		log.Println(err)

@@ -1,4 +1,8 @@
 {
+  "global" : {
+    "data" : { "AppName" : "Test lienzo!" }
+  },
+
   "/test" : {
     "tmpl" : "test",
     "data" : { "Test" : "my data" }
