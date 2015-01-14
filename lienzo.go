@@ -19,6 +19,7 @@ func (tm TemplateMap) Routes(r *mux.Router, hand func(http.ResponseWriter, *http
 	for route, _ := range tm {
 		r.HandleFunc(route, hand)
 	}
+	r.HandleFunc("/reload", ReloadConfig).Methods("PUT")
 	return
 }
 
@@ -45,4 +46,14 @@ func LoadMap(path string) TemplateMap {
 		log.Fatalf("Failed to unmarshal:", err.Error())
 	}
 	return m
+}
+
+func ReloadConfig(w http.ResponseWriter, r *http.Request) {
+	// Reload config
+	log.Println("Reloading config..")
+	newm := LoadMap(*file)
+	if newm == nil {
+		log.Println("Failed to reload")
+	}
+	m = newm
 }
