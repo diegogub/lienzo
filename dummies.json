@@ -1,0 +1,11 @@
+{
+  "/apifile" : {
+    "type" : "file",
+    "file" : "dummydata.json"
+  },
+  "/apiurl" : {
+    "type"   : "url",
+    "method" : "GET",
+    "url"    : "http://restcountries.eu/rest/v1/alpha?codes=ar"
+  }
+}

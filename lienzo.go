@@ -3,10 +3,45 @@ package main
 import (
 	"encoding/json"
 	"github.com/gorilla/mux"
+	"html/template"
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
+	"path/filepath"
+	"strings"
 )
+
+func Handler(w http.ResponseWriter, r *http.Request) {
+	defer func() {
+		if e := recover(); e != nil {
+			ErrorHTML(e, w)
+		}
+	}()
+	log.Println(r.URL.Path)
+	// parse file
+	tinfo, ok := m[r.URL.Path]
+	if !ok {
+		http.NotFound(w, r)
+	}
+	tmps := template.New("tmp")
+	// Load all templates in every request! . We don't need performace,just to load template
+	filepath.Walk(*dir, func(path string, info os.FileInfo, err error) error {
+		if strings.HasSuffix(path, *kind) {
+			log.Println("Matched files:", path)
+			tmps = template.Must(tmps.ParseFiles(path))
+		}
+		return nil
+	})
+
+	if _, ok := m["global"]; ok {
+		tinfo.Sum(m["global"])
+	}
+	err := tmps.ExecuteTemplate(w, tinfo.Tmpl, tinfo.Data)
+	if err != nil {
+		log.Println(err)
+	}
+}
 
 type TemplateMap map[string]TemplateInfo
 
@@ -27,9 +62,9 @@ func (tm TemplateInfo) Sum(t TemplateInfo) {
 	return
 }
 
-func (tm TemplateMap) Routes(r *mux.Router, hand func(http.ResponseWriter, *http.Request)) {
+func (tm TemplateMap) Routes(r *mux.Router) {
 	for route, _ := range tm {
-		r.HandleFunc(route, hand)
+		r.HandleFunc(route, Handler)
 	}
 	r.HandleFunc("/reload", ReloadConfig).Methods("PUT")
 	return
@@ -67,5 +102,12 @@ func ReloadConfig(w http.ResponseWriter, r *http.Request) {
 	if newm == nil {
 		log.Println("Failed to reload")
 	}
+
 	m = newm
+	log.Println("Reloading config..")
+	newa := LoadDummy(*apis)
+	if newa == nil {
+		log.Println("Failed to reload")
+	}
+	a = newa
 }

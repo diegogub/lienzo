@@ -8,7 +8,7 @@ import (
 var errtmpl string = `
 <html>
 <body>
-<p>Error in template:</p>
+<p>Error while loading resource:</p>
 <b> {{ .Error }} </b>
 </body>
 </html>
