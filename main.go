@@ -17,10 +17,11 @@ var (
 )
 
 var (
-	file = flag.String("config", "lienzo.json", "Configuration file")
-	dir  = flag.String("dir", ".", "Templates directory")
-	port = flag.String("port", "8989", "default port")
-	kind = flag.String("suffix", ".html", "documents suffix to load as template")
+	file   = flag.String("config", "lienzo.json", "Configuration file")
+	dir    = flag.String("dir", ".", "Templates directory")
+	assets = flag.String("assets", "", "Assets directory name to serve static files, must be in same the folder")
+	port   = flag.String("port", "8989", "default port")
+	kind   = flag.String("suffix", ".html", "documents suffix to load as template")
 )
 
 func Handler(w http.ResponseWriter, r *http.Request) {
@@ -53,11 +54,20 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	flag.Parse()
+	if *assets == "" {
+		log.Println("WARNING - Assets directory not set! set using flag:  ./lienzo -assets static")
+	}
+
 	r = mux.NewRouter()
 	m = LoadMap(*file)
 
 	log.Println("Loaded File:", m)
 	m.Routes(r, Handler)
+
+	if *assets != "" {
+		r.PathPrefix("/" + *assets + "/").Handler(http.StripPrefix("/"+*assets+"/",
+			http.FileServer(http.Dir(*assets+"/"))))
+	}
 
 	err := http.ListenAndServe(":"+*port, r)
 	if err != nil {
