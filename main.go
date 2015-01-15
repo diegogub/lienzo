@@ -14,12 +14,14 @@ var (
 )
 
 var (
-	file   = flag.String("config", "lienzo.json", "Configuration file")
-	apis   = flag.String("api", "dummies.json", "Configuration file for dummy services")
-	dir    = flag.String("dir", ".", "Templates directory")
-	assets = flag.String("assets", "", "Assets directory name to serve static files, must be in same the folder")
-	port   = flag.String("port", "8989", "default port")
-	kind   = flag.String("suffix", ".html", "documents suffix to load as template")
+	file      = flag.String("config", "lienzo.json", "Configuration file")
+	apis      = flag.String("api", "dummies.json", "Configuration file for dummy services")
+	dir       = flag.String("dir", ".", "Templates directory")
+	assets    = flag.String("assets", "", "Assets directory name to serve static files, must be in same the folder")
+	port      = flag.String("port", "8989", "default port")
+	kind      = flag.String("suffix", ".html", "documents suffix to load as template")
+	admin     = flag.Bool("admin", false, "turns web admin on")
+	adminport = flag.String("aport", "8990", "admin port")
 )
 
 func main() {
@@ -40,6 +42,10 @@ func main() {
 	if *assets != "" {
 		r.PathPrefix("/" + *assets + "/").Handler(http.StripPrefix("/"+*assets+"/",
 			http.FileServer(http.Dir(*assets+"/"))))
+	}
+
+	if *admin {
+		go AdminInit(*adminport)
 	}
 
 	err := http.ListenAndServe(":"+*port, r)

@@ -50,17 +50,28 @@ func (tm TemplateMap) String() string {
 	return string(b)
 }
 
-// Sum 2 maps
-func (tm TemplateInfo) Sum(t TemplateInfo) {
-	for key, value := range t.Data {
-		if _, ok := tm.Data[key]; !ok {
-			tm.Data[key] = value
-		} else {
-			log.Println("warn: overwritting data key: "+key+":", value)
-		}
+// Persist template map to file
+func (tm TemplateMap) Persist(file string) error {
+	f, err := os.Create(file)
+	defer f.Close()
+	if err != nil {
+		return err
 	}
-	return
+
+	_, err = f.WriteString(tm.String())
+	if err != nil {
+		return err
+	}
+
+	err = f.Sync()
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
+
+// Sum 2 maps
 
 func (tm TemplateMap) Routes(r *mux.Router) {
 	for route, _ := range tm {
@@ -79,6 +90,23 @@ func NewMap() TemplateMap {
 type TemplateInfo struct {
 	Tmpl string                 `json:"tmpl"`
 	Data map[string]interface{} `json:"data"`
+}
+
+func NewTInfo() TemplateInfo {
+	var tmpl TemplateInfo
+	tmpl.Data = make(map[string]interface{})
+	return tmpl
+}
+
+func (tm TemplateInfo) Sum(t TemplateInfo) {
+	for key, value := range t.Data {
+		if _, ok := tm.Data[key]; !ok {
+			tm.Data[key] = value
+		} else {
+			log.Println("warn: overwritting data key: "+key+":", value)
+		}
+	}
+	return
 }
 
 // Load from file
