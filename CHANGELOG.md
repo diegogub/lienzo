@@ -3,6 +3,7 @@
 * Global data, passed to all templates
 * Show Template Errors as html
 * Static assets serving, configured via flag
+* Dummy services
 
 0.1
 ===
