@@ -24,7 +24,15 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	if !ok {
 		http.NotFound(w, r)
 	}
-	tmps := template.New("tmp")
+
+	funcMap := template.FuncMap{
+		"marshal": func(v interface{}) template.JS {
+			a, _ := json.Marshal(v)
+			return template.JS(a)
+		},
+	}
+
+	tmps := template.New("tmp").Funcs(funcMap)
 	// Load all templates in every request! . We don't need performace,just to load template
 	filepath.Walk(*dir, func(path string, info os.FileInfo, err error) error {
 		if strings.HasSuffix(path, *kind) {
